@@ -1,0 +1,100 @@
+<div class="historial-container">
+  <div class="historial-header">
+    <h2>📜 Historial de Transmisiones</h2>
+    <button class="btn-refresh" (click)="actualizarHistorial()">🔄 Actualizar</button>
+  </div>
+
+  <!-- Estadísticas -->
+  <div class="stats-bar">
+    <div class="stat">
+      <span class="value">{{ estadisticas.total }}</span>
+      <span class="label">Total</span>
+    </div>
+    <div class="stat success">
+      <span class="value">{{ estadisticas.exitosos }}</span>
+      <span class="label">Exitosas</span>
+    </div>
+    <div class="stat error">
+      <span class="value">{{ estadisticas.fallidos }}</span>
+      <span class="label">Fallidas</span>
+    </div>
+    <div class="stat">
+      <span class="value">{{ estadisticas.tiempoPromedio | number:'1.0-0' }}ms</span>
+      <span class="label">Tiempo Prom.</span>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filtros">
+    <button 
+      [class.active]="filtroActivo === 'todos'"
+      (click)="setFiltro('todos')">
+      Todos
+    </button>
+    <button 
+      [class.active]="filtroActivo === 'exitosos'"
+      (click)="setFiltro('exitosos')">
+      ✅ Exitosos
+    </button>
+    <button 
+      [class.active]="filtroActivo === 'fallidos'"
+      (click)="setFiltro('fallidos')">
+      ❌ Fallidos
+    </button>
+  </div>
+
+  <!-- Lista de transmisiones -->
+  <div class="transmisiones-lista" *ngIf="historialFiltrado.length > 0">
+    <div 
+      *ngFor="let registro of historialFiltrado; let i = index" 
+      class="transmision-item"
+      [class.exito]="registro.exito"
+      [class.fallo]="!registro.exito">
+      
+      <div class="item-header">
+        <span class="status-icon">{{ registro.exito ? '✅' : '❌' }}</span>
+        <span class="timestamp">{{ formatearFecha(registro.timestamp) }}</span>
+        <span class="tiempo">{{ registro.tiempoMs }}ms</span>
+      </div>
+      
+      <div class="item-body">
+        <div class="mensaje-info">
+          <span class="ruta">
+            {{ registro.mensaje.remitente }} → {{ registro.mensaje.destinatario }}
+          </span>
+          
+          <!-- Codificador usado -->
+          <div class="codificador-badge" *ngIf="registro.codificadorUsado">
+            🔤 {{ registro.codificadorUsado }}
+          </div>
+          
+          <!-- Contenido enviado y recibido -->
+          <div class="transmision-detalle">
+            <div class="enviado">
+              <span class="label">📤 Enviado:</span>
+              <span class="valor">"{{ registro.contenidoEnviado || registro.mensaje.contenido }}"</span>
+            </div>
+            <div class="recibido" *ngIf="registro.exito && registro.contenidoRecibido">
+              <span class="label">📥 Recibido:</span>
+              <span class="valor traducido">"{{ registro.contenidoRecibido }}"</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="error-info" *ngIf="!registro.exito && registro.error">
+          <span class="error-label">⚠️ Error:</span>
+          <span class="error-text">{{ registro.error }}</span>
+          <span class="componente-fallo" *ngIf="registro.componenteFallo">
+            📍 En: {{ registro.componenteFallo }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estado vacío -->
+  <div class="empty-state" *ngIf="historialFiltrado.length === 0">
+    <span class="empty-icon">📭</span>
+    <p>No hay transmisiones {{ filtroActivo !== 'todos' ? 'con este filtro' : 'registradas' }}</p>
+  </div>
+</div>

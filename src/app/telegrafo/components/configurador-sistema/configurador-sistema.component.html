@@ -1,0 +1,135 @@
+<div class="configurador">
+  <!-- Emisores -->
+  <div class="emisores-section">
+    <div class="section-header">
+      <h3>📡 Emisores</h3>
+      <button class="btn-add" (click)="agregarEmisor()" title="Añadir Emisor">
+        ➕ Añadir
+      </button>
+    </div>
+    <div class="emisores-list">
+      <div *ngFor="let emisor of emisores; let i = index" class="emisor-item">
+        <div class="config-item">
+          <label>Emisor {{ i + 1 }}</label>
+          <select 
+            [(ngModel)]="emisor.subtipo"
+            [ngModelOptions]="{standalone: true}">
+            <option *ngFor="let tipo of tiposEmisor" [value]="tipo">
+              {{ tipo }}
+            </option>
+          </select>
+        </div>
+        <button 
+          class="btn-remove" 
+          (click)="eliminarEmisor(i)" 
+          [disabled]="emisores.length <= 1"
+          title="Eliminar Emisor">
+          ❌
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Receptores -->
+  <div class="receptores-section">
+    <div class="section-header">
+      <h3>📥 Receptores</h3>
+      <button class="btn-add" (click)="agregarReceptor()" title="Añadir Receptor">
+        ➕ Añadir
+      </button>
+    </div>
+    <div class="receptores-list">
+      <div *ngFor="let receptor of receptores; let i = index" class="receptor-item">
+        <div class="config-item">
+          <label>Receptor {{ i + 1 }}</label>
+          <select 
+            [(ngModel)]="receptor.subtipo"
+            [ngModelOptions]="{standalone: true}">
+            <option *ngFor="let tipo of tiposReceptor" [value]="tipo">
+              {{ tipo }}
+            </option>
+          </select>
+        </div>
+        <button 
+          class="btn-remove" 
+          (click)="eliminarReceptor(i)" 
+          [disabled]="receptores.length <= 1"
+          title="Eliminar Receptor">
+          ❌
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Componentes Intermedios -->
+  <div class="componentes-intermedios">
+    <div class="componentes-header">
+      <h3>🔗 Componentes Intermedios</h3>
+      <div class="add-buttons">
+        <button class="btn-add" (click)="agregarComponente('CANAL')" title="Añadir Canal">
+          ➕ Canal
+        </button>
+        <button class="btn-add" (click)="agregarComponente('RELE')" title="Añadir Relé">
+          ➕ Relé
+        </button>
+      </div>
+    </div>
+
+    <div class="componentes-list">
+      <div *ngFor="let comp of componentesIntermedios; let i = index" class="componente-item">
+        <div class="componente-config">
+          <div class="config-item">
+            <label>{{ comp.tipo === TipoNodo.CANAL ? '🔌 Canal' : '🔋 Relé' }}</label>
+            <select 
+              [(ngModel)]="comp.subtipo"
+              [ngModelOptions]="{standalone: true}">
+              <ng-container *ngIf="comp.tipo === TipoNodo.CANAL">
+                <option *ngFor="let tipo of tiposCanal" [value]="tipo">
+                  {{ tipo }}
+                </option>
+              </ng-container>
+              <ng-container *ngIf="comp.tipo === TipoNodo.RELE">
+                <option *ngFor="let tipo of tiposRele" [value]="tipo">
+                  {{ tipo }}
+                </option>
+              </ng-container>
+            </select>
+          </div>
+
+          <div class="param-input" *ngIf="comp.tipo === TipoNodo.CANAL">
+            <label>Distancia (km):</label>
+            <select 
+              [(ngModel)]="comp.distancia"
+              [ngModelOptions]="{standalone: true}">
+              <option [value]="50">50 km</option>
+              <option [value]="100">100 km</option>
+              <option [value]="150">150 km</option>
+              <option [value]="200">200 km</option>
+              <option [value]="300">300 km</option>
+              <option [value]="400">400 km</option>
+              <option [value]="500">500 km</option>
+              <option [value]="750">750 km</option>
+              <option [value]="1000">1000 km</option>
+            </select>
+          </div>
+        </div>
+        <div class="componente-controls">
+          <button class="btn-move" (click)="moverArriba(i)" [disabled]="i === 0" title="Mover arriba">
+            ⬆️
+          </button>
+          <button class="btn-move" (click)="moverAbajo(i)" [disabled]="i === componentesIntermedios.length - 1" title="Mover abajo">
+            ⬇️
+          </button>
+          <button class="btn-remove" (click)="eliminarComponente(i)" [disabled]="componentesIntermedios.length <= 1" title="Eliminar">
+            ❌
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-apply" (click)="aplicarConfiguracion()">
+    ⚡ Aplicar Configuración
+  </button>
+</div>

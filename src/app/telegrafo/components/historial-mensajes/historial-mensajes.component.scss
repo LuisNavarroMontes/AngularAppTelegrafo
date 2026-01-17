@@ -1,0 +1,279 @@
+$primary-color: #c9a227;
+$bg-dark: #1a1a2e;
+$bg-darker: #0f0f1a;
+$bg-card: #16213e;
+$text-primary: #e8e8e8;
+$text-secondary: #a0a0a0;
+$success-color: #4ade80;
+$error-color: #f87171;
+$border-color: #2d3748;
+
+.historial-container {
+  width: 100%;
+}
+
+.historial-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+
+  h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: $primary-color;
+  }
+
+  .btn-refresh {
+    background: transparent;
+    border: 1px solid $border-color;
+    color: $text-secondary;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: $primary-color;
+      color: $primary-color;
+    }
+  }
+}
+
+.stats-bar {
+  display: flex;
+  justify-content: space-around;
+  background: $bg-darker;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+
+  .stat {
+    text-align: center;
+
+    .value {
+      display: block;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: $primary-color;
+    }
+
+    .label {
+      font-size: 0.7rem;
+      color: $text-secondary;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    &.success .value { color: $success-color; }
+    &.error .value { color: $error-color; }
+  }
+}
+
+.filtros {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+
+  button {
+    background: $bg-darker;
+    border: 1px solid $border-color;
+    color: $text-secondary;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: $primary-color;
+    }
+
+    &.active {
+      background: $primary-color;
+      border-color: $primary-color;
+      color: $bg-darker;
+    }
+  }
+}
+
+.transmisiones-lista {
+  max-height: 400px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $bg-darker;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $border-color;
+    border-radius: 3px;
+
+    &:hover {
+      background: $primary-color;
+    }
+  }
+}
+
+.transmision-item {
+  background: $bg-darker;
+  border-radius: 8px;
+  border-left: 3px solid $border-color;
+  padding: 1rem;
+  transition: all 0.3s ease;
+
+  &.exito {
+    border-left-color: $success-color;
+  }
+
+  &.fallo {
+    border-left-color: $error-color;
+  }
+
+  &:hover {
+    transform: translateX(5px);
+  }
+
+  .item-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+
+    .status-icon {
+      font-size: 1.2rem;
+    }
+
+    .timestamp {
+      font-size: 0.8rem;
+      color: $text-secondary;
+    }
+
+    .tiempo {
+      margin-left: auto;
+      font-size: 0.8rem;
+      color: $primary-color;
+      font-weight: 600;
+    }
+  }
+
+  .item-body {
+    .mensaje-info {
+      .ruta {
+        font-size: 0.75rem;
+        color: $text-secondary;
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+
+      .codificador-badge {
+        display: inline-block;
+        background: rgba($primary-color, 0.15);
+        color: $primary-color;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        margin-bottom: 0.75rem;
+        border: 1px solid rgba($primary-color, 0.3);
+      }
+
+      .transmision-detalle {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 6px;
+        padding: 0.75rem;
+        
+        .enviado, .recibido {
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+          
+          .label {
+            font-size: 0.7rem;
+            color: $text-secondary;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          
+          .valor {
+            font-size: 0.9rem;
+            color: $text-primary;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+          }
+        }
+        
+        .enviado {
+          margin-bottom: 0.5rem;
+          padding-bottom: 0.5rem;
+          border-bottom: 1px dashed $border-color;
+        }
+        
+        .recibido {
+          .valor.traducido {
+            color: $success-color;
+            font-weight: 600;
+          }
+        }
+      }
+
+      .contenido {
+        margin: 0;
+        font-size: 0.95rem;
+        color: $text-primary;
+        font-style: italic;
+      }
+    }
+
+    .error-info {
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid $border-color;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      .error-label {
+        font-size: 0.75rem;
+        color: $error-color;
+        text-transform: uppercase;
+      }
+
+      .error-text {
+        font-size: 0.85rem;
+        color: $error-color;
+      }
+      
+      .componente-fallo {
+        font-size: 0.75rem;
+        color: $text-secondary;
+        margin-top: 0.25rem;
+      }
+    }
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: $text-secondary;
+
+  .empty-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}

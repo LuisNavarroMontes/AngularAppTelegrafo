@@ -1,0 +1,495 @@
+<div class="telegrafo-container">
+  <!-- Header -->
+  <header class="telegrafo-header">
+    <div class="header-content">
+      <div class="logo">
+        <span class="logo-icon">⚡</span>
+        <h1>Sistema de Telégrafo</h1>
+      </div>
+      <div class="status-badge" [class.active]="sistemaConfigurado" [class.inactive]="!sistemaConfigurado">
+        {{ sistemaConfigurado ? 'Sistema Activo' : 'Sistema Inactivo' }}
+      </div>
+    </div>
+  </header>
+
+  <main class="telegrafo-main">
+    <!-- Panel de Configuración y Emisores -->
+    <div class="config-emisores-layout">
+      <!-- Panel de Configuración (Izquierda) -->
+      <section class="config-panel">
+        <h2>⚙️ Configuración del Sistema</h2>
+        
+        <app-configurador-sistema
+          [tiposEmisor]="tiposEmisor"
+          [tiposCanal]="tiposCanal"
+          [tiposRele]="tiposRele"
+          [tiposReceptor]="tiposReceptor"
+          [configuracionActual]="configuracionActual"
+          (configuracionCambiada)="aplicarConfiguracion($event)">
+        </app-configurador-sistema>
+
+        <div class="config-actions">
+          <button class="btn btn-secondary" (click)="configurarSistemaPorDefecto()">
+            🔄 Restablecer Predeterminado
+          </button>
+          <button class="btn btn-danger" (click)="reiniciarSistema()">
+            ⏹️ Reiniciar Sistema
+          </button>
+        </div>
+      </section>
+
+      <!-- Paneles de Transmisión por Emisor (Derecha) -->
+      <div class="transmission-panels-right">
+        <ng-container *ngIf="todosLosEmisores.length > 0">
+          <ng-container *ngFor="let emisor of todosLosEmisores; let i = index; trackBy: trackByEmisorIndex">
+      <!-- Panel para Emisor Manual -->
+      <section class="transmission-panel emisor-panel manual" *ngIf="emisor.esManual && sistemaConfigurado">
+        <h2>📨 {{ emisor.nombre }} {{ numeroTotalEmisores > 1 ? '(Emisor ' + (i + 1) + ')' : '' }}</h2>
+        
+        <form [formGroup]="obtenerFormularioEmisor(emisor.index)" (ngSubmit)="enviarMensajeDesdeEmisor(emisor.index)" class="message-form">
+          <div class="form-group">
+            <label [for]="'contenido-' + emisor.index">Mensaje:</label>
+            <textarea 
+              [id]="'contenido-' + emisor.index" 
+              formControlName="contenido"
+              rows="3"
+              placeholder="Escribe tu mensaje aquí... (será codificado en Morse)">
+            </textarea>
+          </div>
+          
+          <button 
+            type="submit" 
+            class="btn btn-primary btn-send"
+            [disabled]="!obtenerFormularioEmisor(emisor.index).valid || !sistemaConfigurado">
+            ⚡ Transmitir
+          </button>
+        </form>
+      </section>
+
+      <!-- Panel para Emisor Automático (uno por cada emisor automático) -->
+      <section class="transmission-panel auto-panel emisor-panel automatico" *ngIf="emisor.esAutomatico && sistemaConfigurado">
+        <h2>🤖 {{ emisor.nombre }} 
+          <span *ngIf="numeroEmisoresAutomaticos > 1">
+            (Emisor {{ i + 1 }})
+          </span>
+        </h2>
+        
+        <div class="auto-info">
+          <p>Los mensajes se generan y envían automáticamente en el lenguaje del codificador seleccionado (Morse, Baudot o Binario).</p>
+        </div>
+
+        <!-- Controles de transmisión automática -->
+        <div class="auto-controls">
+          <!-- Selector de intervalo -->
+          <div class="form-group intervalo-group">
+            <label [for]="'intervalo-automatico-' + emisor.index">⏱️ Intervalo entre mensajes:</label>
+            <select 
+              [id]="'intervalo-automatico-' + emisor.index" 
+              [ngModel]="obtenerIntervaloEmisor(emisor.index)"
+              (ngModelChange)="cambiarIntervalo($event, emisor.index)"
+              [disabled]="esTransmisionActiva(emisor.index)"
+              class="intervalo-select"
+              [ngModelOptions]="{standalone: true}">
+              <option *ngFor="let opcion of opcionesIntervalo" [ngValue]="opcion.valor">
+                {{ opcion.etiqueta }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Botón iniciar/detener -->
+          <button 
+            class="btn btn-auto"
+            [class.btn-start]="!esTransmisionActiva(emisor.index)"
+            [class.btn-stop]="esTransmisionActiva(emisor.index)"
+            (click)="toggleTransmisionAutomatica(emisor.index)">
+            <span *ngIf="!esTransmisionActiva(emisor.index)">▶️ Iniciar Transmisión</span>
+            <span *ngIf="esTransmisionActiva(emisor.index)">⏹️ Detener Transmisión</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Panel para Emisor de Pruebas (uno por cada emisor de pruebas) -->
+      <section class="transmission-panel auto-panel emisor-panel pruebas" *ngIf="emisor.esPruebas && sistemaConfigurado">
+        <h2>🧪 {{ emisor.nombre }} 
+          <span *ngIf="numeroEmisoresPruebas > 1">
+            ({{ numeroEmisoresPruebas }} emisores de pruebas)
+          </span>
+        </h2>
+        
+        <div class="auto-info">
+          <p>Envía letras simples (A-Z) automáticamente en el lenguaje del codificador seleccionado (Morse, Baudot o Binario).</p>
+        </div>
+
+        <!-- Controles de transmisión automática -->
+        <div class="auto-controls">
+          <!-- Selector de intervalo -->
+          <div class="form-group intervalo-group">
+            <label [for]="'intervalo-pruebas-' + emisor.index">⏱️ Intervalo entre letras:</label>
+            <select 
+              [id]="'intervalo-pruebas-' + emisor.index" 
+              [ngModel]="obtenerIntervaloEmisor(emisor.index)"
+              (ngModelChange)="cambiarIntervalo($event, emisor.index)"
+              [disabled]="esTransmisionActiva(emisor.index)"
+              class="intervalo-select"
+              [ngModelOptions]="{standalone: true}">
+              <option *ngFor="let opcion of opcionesIntervalo" [ngValue]="opcion.valor">
+                {{ opcion.etiqueta }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Botón iniciar/detener -->
+          <button 
+            class="btn btn-auto"
+            [class.btn-start]="!esTransmisionActiva(emisor.index)"
+            [class.btn-stop]="esTransmisionActiva(emisor.index)"
+            (click)="toggleTransmisionAutomatica(emisor.index)">
+            <span *ngIf="!esTransmisionActiva(emisor.index)">▶️ Iniciar Transmisión</span>
+            <span *ngIf="esTransmisionActiva(emisor.index)">⏹️ Detener Transmisión</span>
+          </button>
+        </div>
+      </section>
+          </ng-container>
+        </ng-container>
+
+        <!-- Paneles de Receptores -->
+        <ng-container *ngIf="todosLosReceptores.length > 0 && sistemaConfigurado">
+          <ng-container *ngFor="let receptor of todosLosReceptores; let i = index; trackBy: trackByReceptorIndex">
+            <section class="transmission-panel receptor-panel" [class.fichero]="receptor.tipo === 'FICHERO'">
+              <h2>
+                <span *ngIf="receptor.tipo === 'FICHERO'">📁</span>
+                <span *ngIf="receptor.tipo === 'CONSOLA'">🖥️</span>
+                <span *ngIf="receptor.tipo === 'MEMORIA'">💾</span>
+                {{ receptor.nombre }}
+                <span *ngIf="todosLosReceptores.length > 1">
+                  (Receptor {{ i + 1 }})
+                </span>
+              </h2>
+
+              <div class="receptor-info">
+                <div class="status-row">
+                  <span class="status-indicator" [class.active]="receptor.activo">●</span>
+                  <span class="status-text">
+                    {{ receptor.activo ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </div>
+                <div class="stats-row">
+                  <span class="stat-label">Mensajes recibidos:</span>
+                  <span class="stat-value">{{ receptor.mensajesRecibidos }}</span>
+                </div>
+              </div>
+
+              <!-- Botones de acción para receptores -->
+              <div class="receptor-actions">
+                <!-- Botón de descarga para receptores FICHERO -->
+                <button 
+                  *ngIf="receptor.tipo === 'FICHERO'"
+                  class="btn btn-primary"
+                  (click)="descargarFicheroReceptor(receptor.index)"
+                  [disabled]="receptor.mensajesRecibidos === 0">
+                  💾 Guardar Fichero
+                </button>
+                
+                <!-- Botón de consultar memoria para receptores MEMORIA -->
+                <button 
+                  *ngIf="receptor.tipo === 'MEMORIA'"
+                  class="btn btn-primary"
+                  (click)="consultarMemoria(receptor.index)">
+                  📋 Consultar Memoria
+                </button>
+              </div>
+
+              <!-- Los mensajes no se muestran en la página principal -->
+              <!-- Se muestran en: -->
+              <!-- - Consola del navegador (para receptor consola) -->
+              <!-- - Modal de memoria (para receptor memoria - botón "Consultar Memoria") -->
+              <div class="sin-mensajes">
+                <p *ngIf="receptor.tipo === 'CONSOLA'">
+                  Los mensajes se muestran únicamente en la consola del navegador.
+                </p>
+                <p *ngIf="receptor.tipo === 'MEMORIA'">
+                  Los mensajes se almacenan en memoria. Usa el botón "Consultar Memoria" para verlos.
+                </p>
+                <p *ngIf="receptor.tipo === 'FICHERO'">
+                  Los mensajes se guardan en fichero. Usa el botón "Guardar Fichero" para descargarlos.
+                </p>
+              </div>
+            </section>
+          </ng-container>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- Visualizador de Señal -->
+    <section class="signal-panel">
+      <h2>📊 Estado del Sistema</h2>
+      
+      <div *ngIf="infoSistema" class="system-status">
+        <div class="status-grid">
+          <!-- Emisores -->
+          <ng-container *ngFor="let emisor of (infoSistema.emisores || (infoSistema.emisor ? [infoSistema.emisor] : [])); let i = index">
+            <div class="component-card" *ngIf="emisor">
+              <div class="card-header">
+                <span class="icon">📡</span>
+                <span class="title">Emisor {{ infoSistema.emisores && infoSistema.emisores.length > 1 ? (i + 1) : '' }}</span>
+              </div>
+              <div class="card-body">
+                <p class="name">{{ emisor.nombre }}</p>
+                <span class="status" [class.on]="emisor.encendido">
+                  {{ emisor.encendido ? 'Encendido' : 'Apagado' }}
+                </span>
+              </div>
+            </div>
+            <div class="connector" *ngIf="i < (infoSistema.emisores?.length || (infoSistema.emisor ? 1 : 0)) - 1">+</div>
+          </ng-container>
+
+          <!-- Componentes intermedios -->
+          <ng-container *ngFor="let comp of infoSistema.componentesIntermedios; let i = index">
+            <div class="connector">→</div>
+            <div class="component-card" 
+                 [class.canal]="comp.tipo === 'CANAL'" 
+                 [class.rele]="comp.tipo === 'RELE'"
+                 [class.bateria-critica]="comp.bateria?.critico"
+                 [class.bateria-agotada]="comp.bateria?.agotada">
+              <div class="card-header">
+                <span class="icon">{{ comp.tipo === 'CANAL' ? '🔌' : '🔋' }}</span>
+                <span class="title">{{ comp.tipo }}</span>
+              </div>
+              <div class="card-body">
+                <p class="name">{{ comp.nombre }}</p>
+                
+                <!-- Indicador de batería (solo para relés con batería) -->
+                <div class="battery-indicator" *ngIf="comp.bateria">
+                  <div class="battery-icon">
+                    <span *ngIf="comp.bateria.nivel > 75">🔋</span>
+                    <span *ngIf="comp.bateria.nivel > 25 && comp.bateria.nivel <= 75">🔋</span>
+                    <span *ngIf="comp.bateria.nivel > 0 && comp.bateria.nivel <= 25">🪫</span>
+                    <span *ngIf="comp.bateria.nivel <= 0">❌</span>
+                  </div>
+                  <div class="battery-bar">
+                    <div class="battery-level" 
+                         [style.width.%]="comp.bateria.nivel"
+                         [class.high]="comp.bateria.nivel > 50"
+                         [class.medium]="comp.bateria.nivel > 20 && comp.bateria.nivel <= 50"
+                         [class.low]="comp.bateria.nivel <= 20">
+                    </div>
+                  </div>
+                  <span class="battery-text" 
+                        [class.critico]="comp.bateria.critico"
+                        [class.agotada]="comp.bateria.agotada">
+                    {{ comp.bateria.nivel.toFixed(0) }}%
+                  </span>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- Separador entre componentes intermedios y receptores -->
+          <div class="connector" *ngIf="(infoSistema.receptores && infoSistema.receptores.length > 0) || infoSistema.receptor">→</div>
+
+          <!-- Receptores -->
+          <ng-container *ngFor="let receptor of (infoSistema.receptores || (infoSistema.receptor ? [infoSistema.receptor] : [])); let i = index">
+            <div class="component-card" *ngIf="receptor">
+              <div class="card-header">
+                <span class="icon">📥</span>
+                <span class="title">Receptor {{ infoSistema.receptores && infoSistema.receptores.length > 1 ? (i + 1) : '' }}</span>
+              </div>
+              <div class="card-body">
+                <p class="name">{{ receptor.nombre }}</p>
+                <span class="status" [class.on]="receptor.activo">
+                  {{ receptor.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+                <p class="stats">{{ receptor.mensajesRecibidos }} mensajes</p>
+              </div>
+            </div>
+            <div class="connector" *ngIf="i < (infoSistema.receptores?.length || (infoSistema.receptor ? 1 : 0)) - 1">+</div>
+          </ng-container>
+        </div>
+
+        <!-- Estadísticas generales -->
+        <div class="general-stats">
+          <div class="stat">
+            <span class="stat-value">{{ infoSistema.transmisionesRealizadas }}</span>
+            <span class="stat-label">Total Transmisiones</span>
+          </div>
+          <div class="stat success">
+            <span class="stat-value">{{ infoSistema.transmisionesExitosas }}</span>
+            <span class="stat-label">Exitosas</span>
+          </div>
+          <div class="stat error">
+            <span class="stat-value">{{ infoSistema.transmisionesRealizadas - infoSistema.transmisionesExitosas }}</span>
+            <span class="stat-label">Fallidas</span>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!infoSistema" class="no-system">
+        <p>⚠️ Configure el sistema para ver el estado</p>
+      </div>
+    </section>
+
+    <!-- Historial -->
+    <section class="history-panel">
+      <app-historial-mensajes></app-historial-mensajes>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="telegrafo-footer">
+    <p>Sistema de Telégrafo Eléctrico - Simulación POO</p>
+  </footer>
+</div>
+
+<!-- Modal de Consulta de Memoria -->
+<div class="modal-overlay" *ngIf="mostrarModalMemoria" (click)="cerrarModalMemoria()">
+  <div class="modal-content memoria-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>💾 Memoria del Receptor</h2>
+      <button class="btn-close" (click)="cerrarModalMemoria()">✕</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="memoria-stats">
+        <div class="stat-item">
+          <span class="stat-label">Total entradas:</span>
+          <span class="stat-value">{{ memoriaActual.length }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Enviados:</span>
+          <span class="stat-value" style="color: #60a5fa;">{{ totalMensajesEnviadosMemoria }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Recibidos:</span>
+          <span class="stat-value success">{{ totalMensajesMemoria }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Errores:</span>
+          <span class="stat-value error">{{ totalErroresMemoria }}</span>
+        </div>
+      </div>
+      
+      <div class="memoria-list" *ngIf="memoriaActual.length > 0">
+        <div 
+          class="memoria-item" 
+          [class.mensaje]="entrada.tipo === 'mensaje'"
+          [class.error]="entrada.tipo === 'error'"
+          [class.enviado]="entrada.tipo === 'enviado'"
+          *ngFor="let entrada of memoriaActual; let i = index">
+          
+          <div class="memoria-item-header">
+            <span class="memoria-indice">#{{ i + 1 }}</span>
+            <span class="memoria-tipo" 
+                  [class.tipo-mensaje]="entrada.tipo === 'mensaje'" 
+                  [class.tipo-error]="entrada.tipo === 'error'"
+                  [class.tipo-enviado]="entrada.tipo === 'enviado'">
+              {{ entrada.tipo === 'mensaje' ? '📨 Mensaje Recibido' : entrada.tipo === 'enviado' ? '📤 Mensaje Enviado' : '❌ Error' }}
+            </span>
+            <span class="memoria-timestamp">{{ entrada.timestamp | date:'short' }}</span>
+          </div>
+          
+          <ng-container *ngIf="esMensaje(entrada)">
+            <div class="memoria-item-body">
+              <div class="memoria-mensaje-info">
+                <div class="info-row">
+                  <span class="info-label">De:</span>
+                  <span class="info-value">{{ obtenerMensaje(entrada)?.remitente }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Para:</span>
+                  <span class="info-value">{{ obtenerMensaje(entrada)?.destinatario }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Contenido:</span>
+                  <span class="info-value contenido-mensaje">{{ obtenerMensaje(entrada)?.contenido }}</span>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          
+          <ng-container *ngIf="esMensajeEnviado(entrada)">
+            <div class="memoria-item-body">
+              <div class="memoria-enviado-info">
+                <div class="info-row">
+                  <span class="info-label">De:</span>
+                  <span class="info-value">{{ obtenerMensajeEnviado(entrada)?.remitente }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Para:</span>
+                  <span class="info-value">{{ obtenerMensajeEnviado(entrada)?.destinatario }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Contenido enviado:</span>
+                  <span class="info-value contenido-enviado">{{ obtenerMensajeEnviado(entrada)?.contenido }}</span>
+                </div>
+                <div class="info-row" *ngIf="obtenerMensajeEnviado(entrada)?.contenidoRecibido">
+                  <span class="info-label">Contenido recibido:</span>
+                  <span class="info-value contenido-recibido">{{ obtenerMensajeEnviado(entrada)?.contenidoRecibido }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Estado:</span>
+                  <span class="info-value" [class.exito]="obtenerMensajeEnviado(entrada)?.exito" [class.fallo]="!obtenerMensajeEnviado(entrada)?.exito">
+                    {{ obtenerMensajeEnviado(entrada)?.exito ? '✅ Exitoso' : '❌ Fallido' }}
+                  </span>
+                </div>
+                <!-- Información del fallo -->
+                <div class="info-row" *ngIf="!obtenerMensajeEnviado(entrada)?.exito && obtenerMensajeEnviado(entrada)?.error">
+                  <span class="info-label">Fallo:</span>
+                  <span class="info-value error-mensaje">{{ obtenerMensajeEnviado(entrada)?.error }}</span>
+                </div>
+                <div class="info-row" *ngIf="!obtenerMensajeEnviado(entrada)?.exito && obtenerMensajeEnviado(entrada)?.componenteFallo">
+                  <span class="info-label">Componente que falló:</span>
+                  <span class="info-value error-code">{{ obtenerMensajeEnviado(entrada)?.componenteFallo }}</span>
+                </div>
+                <div class="info-row" *ngIf="obtenerMensajeEnviado(entrada)?.tiempoMs">
+                  <span class="info-label">Tiempo:</span>
+                  <span class="info-value">{{ obtenerMensajeEnviado(entrada)?.tiempoMs }}ms</span>
+                </div>
+                <div class="info-row" *ngIf="obtenerMensajeEnviado(entrada)?.codificadorUsado">
+                  <span class="info-label">Codificador:</span>
+                  <span class="info-value">{{ obtenerMensajeEnviado(entrada)?.codificadorUsado }}</span>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          
+          <ng-container *ngIf="esError(entrada)">
+            <div class="memoria-item-body">
+              <div class="memoria-error-info">
+                <div class="info-row">
+                  <span class="info-label">Codigo:</span>
+                  <span class="info-value error-code">{{ obtenerError(entrada)?.codigo }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Mensaje:</span>
+                  <span class="info-value error-mensaje">{{ obtenerError(entrada)?.mensaje }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Componente:</span>
+                  <span class="info-value">{{ obtenerError(entrada)?.componenteNombre }}</span>
+                </div>
+                <div class="info-row" *ngIf="obtenerError(entrada)?.recuperable !== undefined">
+                  <span class="info-label">Recuperable:</span>
+                  <span class="info-value" [class.recuperable]="obtenerError(entrada)?.recuperable" [class.no-recuperable]="!obtenerError(entrada)?.recuperable">
+                    {{ obtenerError(entrada)?.recuperable ? 'Sí' : 'No' }}
+                  </span>
+                </div>
+                <div class="info-row" *ngIf="obtenerError(entrada)?.sugerencia">
+                  <span class="info-label">Sugerencia:</span>
+                  <span class="info-value sugerencia">{{ obtenerError(entrada)?.sugerencia }}</span>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+      
+      <div class="memoria-vacia" *ngIf="memoriaActual.length === 0">
+        <p>La memoria está vacía. No se han enviado mensajes, recibido mensajes ni errores aún.</p>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="cerrarModalMemoria()">Cerrar</button>
+    </div>
+  </div>
+</div>

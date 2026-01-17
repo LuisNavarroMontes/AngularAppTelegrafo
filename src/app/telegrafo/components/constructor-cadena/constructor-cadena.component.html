@@ -1,0 +1,400 @@
+<div class="constructor-cadena">
+  
+  <!-- MENSAJE DE ESTADO -->
+  <div class="mensaje-estado" *ngIf="mensajeEstado" [ngClass]="tipoMensaje">
+    <span class="icono">
+      {{ tipoMensaje === 'success' ? '✅' : tipoMensaje === 'error' ? '❌' : 'ℹ️' }}
+    </span>
+    {{ mensajeEstado }}
+  </div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <h2>🔧 Constructor de Sistema de Telégrafo</h2>
+    <p class="subtitulo">Selecciona y configura los componentes para construir tu cadena de transmisión</p>
+  </div>
+
+  <div class="contenido-principal">
+    
+    <!-- PANEL IZQUIERDO: CATÁLOGO -->
+    <div class="panel-catalogo">
+      <h3>📦 Catálogo de Componentes</h3>
+      
+      <!-- TABS -->
+      <div class="tabs">
+        <button 
+          class="tab" 
+          [class.activa]="tabActiva === 'emisores'"
+          (click)="tabActiva = 'emisores'">
+          📤 Emisores
+        </button>
+        <button 
+          class="tab" 
+          [class.activa]="tabActiva === 'canales'"
+          (click)="tabActiva = 'canales'">
+          📡 Canales
+        </button>
+        <button 
+          class="tab" 
+          [class.activa]="tabActiva === 'reles'"
+          (click)="tabActiva = 'reles'">
+          🔌 Relés
+        </button>
+        <button 
+          class="tab" 
+          [class.activa]="tabActiva === 'receptores'"
+          (click)="tabActiva = 'receptores'">
+          📥 Receptores
+        </button>
+        <button 
+          class="tab" 
+          [class.activa]="tabActiva === 'codificadores'"
+          (click)="tabActiva = 'codificadores'">
+          🔤 Codificadores
+        </button>
+      </div>
+
+      <!-- CONTENIDO DE TABS -->
+      <div class="tab-contenido">
+        
+        <!-- EMISORES -->
+        <div class="lista-componentes" *ngIf="tabActiva === 'emisores'">
+          <div 
+            class="componente-card" 
+            *ngFor="let emisor of emisoresDisponibles; trackBy: trackByEmisorId">
+            <div class="icono">{{ emisor.icono || '📤' }}</div>
+            <div class="info">
+              <h4>{{ emisor.nombre }}</h4>
+              <p>{{ emisor.descripcion }}</p>
+              <span class="contador-emisores" *ngIf="contarEmisores(emisor.id) > 0">
+                ({{ contarEmisores(emisor.id) }} añadido{{ contarEmisores(emisor.id) > 1 ? 's' : '' }})
+              </span>
+            </div>
+            <button 
+              class="btn-seleccionar" 
+              [title]="'Añadir emisor (puedes añadir varios). Total: ' + contarEmisores(emisor.id)"
+              (click)="seleccionarEmisor(emisor); $event.stopPropagation()"
+              type="button">
+              ➕
+            </button>
+          </div>
+        </div>
+
+        <!-- CANALES -->
+        <div class="lista-componentes" *ngIf="tabActiva === 'canales'">
+          <div 
+            class="componente-card" 
+            *ngFor="let canal of canalesDisponibles"
+            (click)="agregarComponenteIntermedio(canal)">
+            <div class="icono">{{ canal.icono || '📡' }}</div>
+            <div class="info">
+              <h4>{{ canal.nombre }}</h4>
+              <p>{{ canal.descripcion }}</p>
+            </div>
+            <button class="btn-seleccionar" title="Añadir a la cadena">+</button>
+          </div>
+        </div>
+
+        <!-- RELÉS -->
+        <div class="lista-componentes" *ngIf="tabActiva === 'reles'">
+          <div 
+            class="componente-card" 
+            *ngFor="let rele of relesDisponibles"
+            (click)="agregarComponenteIntermedio(rele)">
+            <div class="icono">{{ rele.icono || '🔌' }}</div>
+            <div class="info">
+              <h4>{{ rele.nombre }}</h4>
+              <p>{{ rele.descripcion }}</p>
+            </div>
+            <button class="btn-seleccionar" title="Añadir a la cadena">+</button>
+          </div>
+        </div>
+
+        <!-- RECEPTORES -->
+        <div class="lista-componentes" *ngIf="tabActiva === 'receptores'">
+          <div 
+            class="componente-card" 
+            *ngFor="let receptor of receptoresDisponibles; trackBy: trackByReceptorId">
+            <div class="icono">{{ receptor.icono || '📥' }}</div>
+            <div class="info">
+              <h4>{{ receptor.nombre }}</h4>
+              <p>{{ receptor.descripcion }}</p>
+              <span class="contador-receptores" *ngIf="contarReceptores(receptor.id) > 0">
+                ({{ contarReceptores(receptor.id) }} añadido{{ contarReceptores(receptor.id) > 1 ? 's' : '' }})
+              </span>
+            </div>
+            <button 
+              class="btn-seleccionar" 
+              [title]="'Añadir receptor (puedes añadir varios). Total: ' + contarReceptores(receptor.id)"
+              (click)="seleccionarReceptor(receptor); $event.stopPropagation()"
+              type="button">
+              ➕
+            </button>
+          </div>
+        </div>
+
+        <!-- CODIFICADORES -->
+        <div class="lista-componentes" *ngIf="tabActiva === 'codificadores'">
+          <div 
+            class="componente-card codificador" 
+            *ngFor="let cod of codificadoresDisponibles"
+            (click)="cambiarCodificador(cod.id)"
+            [class.seleccionado]="codificadorSeleccionadoId === cod.id">
+            <div class="icono">{{ cod.icono || '🔤' }}</div>
+            <div class="info">
+              <h4>{{ cod.nombre }}</h4>
+            </div>
+            <button class="btn-seleccionar" title="Seleccionar">
+              {{ codificadorSeleccionadoId === cod.id ? '✓' : '○' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLANTILLAS -->
+      <div class="plantillas">
+        <h4>📋 Plantillas Rápidas</h4>
+        <div class="botones-plantillas">
+          <button class="btn-plantilla" (click)="cargarPlantillaBasica()">
+            🔰 Básica
+          </button>
+          <button class="btn-plantilla" (click)="cargarPlantillaLargaDistancia()">
+            🌍 Larga Distancia
+          </button>
+          <button class="btn-plantilla" (click)="cargarPlantillaPruebas()">
+            🧪 Pruebas
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL DERECHO: CADENA CONFIGURADA -->
+    <div class="panel-cadena">
+      <div class="cadena-header">
+        <h3>⛓️ Cadena de Transmisión</h3>
+        <button class="btn-limpiar" (click)="limpiarCadena()" title="Limpiar todo">
+          🗑️ Limpiar
+        </button>
+      </div>
+
+      <!-- VISUALIZACIÓN DE LA CADENA -->
+      <div class="cadena-visual">
+        
+        <!-- EMISORES -->
+        <div class="emisores-container" *ngIf="emisoresSeleccionados.length > 0; else slotVacioEmisores">
+          <div 
+            class="slot-componente emisor"
+            *ngFor="let emisor of emisoresSeleccionados; let i = index; trackBy: trackByFn">
+            <div class="etiqueta">EMISOR {{ emisoresSeleccionados.length > 1 ? (i + 1) : '' }}</div>
+            <div class="componente-en-cadena">
+              <span class="icono">{{ emisor.metadata.icono || '📤' }}</span>
+              <span class="nombre">{{ emisor.metadata.nombre }}</span>
+              <div class="acciones">
+                <button 
+                  class="btn-accion" 
+                  (click)="editarComponente(emisor)" 
+                  [disabled]="esEmisorManual(emisor)"
+                  [title]="esEmisorManual(emisor) ? 'El emisor manual no se puede editar' : 'Configurar'">⚙️</button>
+                <button 
+                  class="btn-accion eliminar" 
+                  (click)="eliminarEmisor(i)" 
+                  title="Quitar">✕</button>
+              </div>
+            </div>
+            <div class="flecha-interna" *ngIf="i < emisoresSeleccionados.length - 1">+</div>
+          </div>
+        </div>
+        <ng-template #slotVacioEmisores>
+          <div class="slot-componente emisor vacio">
+            <div class="etiqueta">EMISOR</div>
+            <div class="slot-vacio">
+              <span>Selecciona un emisor</span>
+            </div>
+          </div>
+        </ng-template>
+
+        <!-- FLECHA -->
+        <div class="flecha" *ngIf="emisoresSeleccionados.length > 0">➜</div>
+
+        <!-- COMPONENTES INTERMEDIOS -->
+        <div class="componentes-intermedios" *ngIf="componentesIntermedios.length > 0">
+          <div 
+            class="slot-componente intermedio"
+            *ngFor="let comp of componentesIntermedios; let i = index; trackBy: trackByFn">
+            <div class="etiqueta">{{ comp.metadata.tipoNodo }}</div>
+            <div class="componente-en-cadena">
+              <span class="icono">{{ comp.metadata.icono || getIconoTipo(comp.metadata.tipoNodo) }}</span>
+              <span class="nombre">{{ comp.metadata.nombre }}</span>
+              <div class="acciones">
+                <button class="btn-accion" (click)="moverArriba(i)" [disabled]="i === 0" title="Mover arriba">↑</button>
+                <button class="btn-accion" (click)="moverAbajo(i)" [disabled]="i === componentesIntermedios.length - 1" title="Mover abajo">↓</button>
+                <button class="btn-accion" (click)="editarComponente(comp)" title="Configurar">⚙️</button>
+                <button class="btn-accion eliminar" (click)="eliminarComponenteIntermedio(i)" title="Quitar">✕</button>
+              </div>
+            </div>
+            <div class="flecha-interna" *ngIf="i < componentesIntermedios.length - 1">➜</div>
+          </div>
+        </div>
+
+        <!-- FLECHA -->
+        <div class="flecha" *ngIf="componentesIntermedios.length > 0 || emisoresSeleccionados.length > 0">➜</div>
+
+        <!-- RECEPTORES -->
+        <div class="receptores-container" *ngIf="receptoresSeleccionados.length > 0; else slotVacioReceptores">
+          <div 
+            class="slot-componente receptor"
+            *ngFor="let receptor of receptoresSeleccionados; let i = index; trackBy: trackByFn">
+            <div class="etiqueta">RECEPTOR {{ receptoresSeleccionados.length > 1 ? (i + 1) : '' }}</div>
+            <div class="componente-en-cadena">
+              <span class="icono">{{ receptor.metadata.icono || '📥' }}</span>
+              <span class="nombre">{{ receptor.metadata.nombre }}</span>
+              <div class="acciones">
+                <button class="btn-accion" (click)="editarComponente(receptor)" title="Configurar">⚙️</button>
+                <button class="btn-accion eliminar" (click)="eliminarReceptor(i)" title="Quitar">✕</button>
+              </div>
+            </div>
+            <div class="flecha-interna" *ngIf="i < receptoresSeleccionados.length - 1">+</div>
+          </div>
+        </div>
+        <ng-template #slotVacioReceptores>
+          <div class="slot-componente receptor vacio">
+            <div class="etiqueta">RECEPTOR</div>
+            <div class="slot-vacio">
+              <span>Selecciona un receptor</span>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- RESUMEN DE CONFIGURACIÓN -->
+      <div class="resumen-config">
+        <h4>📊 Resumen</h4>
+        <div class="stats">
+          <div class="stat">
+            <span class="label">Codificador:</span>
+            <span class="valor">{{ getNombreCodificadorSeleccionado() }}</span>
+          </div>
+          <div class="stat">
+            <span class="label">Emisores:</span>
+            <span class="valor">{{ emisoresSeleccionados.length > 0 ? (emisoresSeleccionados.length + ' seleccionado' + (emisoresSeleccionados.length > 1 ? 's' : '')) : 'No seleccionados' }}</span>
+          </div>
+          <div class="stat">
+            <span class="label">Componentes intermedios:</span>
+            <span class="valor">{{ componentesIntermedios.length }}</span>
+          </div>
+          <div class="stat">
+            <span class="label">Receptores:</span>
+            <span class="valor">{{ receptoresSeleccionados.length > 0 ? (receptoresSeleccionados.length + ' seleccionado' + (receptoresSeleccionados.length > 1 ? 's' : '')) : 'No seleccionados' }}</span>
+          </div>
+          <div class="stat">
+            <span class="label">Estado:</span>
+            <span class="valor" [class.valido]="esConfiguracionValida()" [class.invalido]="!esConfiguracionValida()">
+              {{ esConfiguracionValida() ? '✅ Listo' : '⚠️ Incompleto' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTONES DE ACCIÓN -->
+      <div class="acciones-principales">
+        <button 
+          class="btn-principal" 
+          (click)="aplicarConfiguracion(false)"
+          [disabled]="!esConfiguracionValida() || transmisionActiva">
+          🔧 Construir Sistema
+        </button>
+        <button 
+          class="btn-principal iniciar" 
+          (click)="construirYNavegar()"
+          [disabled]="!esConfiguracionValida() || transmisionActiva">
+          🚀 Construir e Ir al Panel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL DE CONFIGURACIÓN (MODAL) -->
+  <div class="modal-overlay" *ngIf="mostrarPanelConfiguracion" (click)="cerrarPanelConfiguracion()">
+    <div class="modal-contenido" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>⚙️ Configurar: {{ componenteEditando?.metadata?.nombre }}</h3>
+        <button class="btn-cerrar" (click)="cerrarPanelConfiguracion()">✕</button>
+      </div>
+      
+      <div class="modal-body" *ngIf="componenteEditando">
+        <div class="descripcion-componente">
+          <span class="icono-grande">{{ componenteEditando.metadata.icono }}</span>
+          <p>{{ componenteEditando.metadata.descripcion }}</p>
+        </div>
+
+        <div class="parametros" *ngIf="componenteEditando.metadata.parametrosConfigurables?.length; else sinParametros">
+          <div 
+            class="parametro" 
+            *ngFor="let param of componenteEditando.metadata.parametrosConfigurables">
+            <label [for]="param.clave">
+              {{ param.nombre }}
+              <span class="descripcion-param" *ngIf="param.descripcion">{{ param.descripcion }}</span>
+            </label>
+            
+            <!-- INPUT NUMÉRICO -->
+            <div class="input-container" *ngIf="param.tipo === 'number'">
+              <input 
+                type="number"
+                [id]="param.clave"
+                [min]="param.min"
+                [max]="param.max"
+                [value]="obtenerValorParametro(param)"
+                (input)="actualizarParametro(param.clave, $any($event.target).valueAsNumber)">
+              <span class="rango" *ngIf="param.min !== undefined && param.max !== undefined">
+                ({{ param.min }} - {{ param.max }})
+              </span>
+            </div>
+
+            <!-- INPUT TEXTO -->
+            <div class="input-container" *ngIf="param.tipo === 'string'">
+              <input 
+                type="text"
+                [id]="param.clave"
+                [value]="obtenerValorParametro(param)"
+                (input)="actualizarParametro(param.clave, $any($event.target).value)">
+            </div>
+
+            <!-- CHECKBOX -->
+            <div class="input-container checkbox" *ngIf="param.tipo === 'boolean'">
+              <input 
+                type="checkbox"
+                [id]="param.clave"
+                [checked]="obtenerValorParametro(param)"
+                (change)="actualizarParametro(param.clave, $any($event.target).checked)">
+            </div>
+
+            <!-- SELECT -->
+            <div class="input-container" *ngIf="param.tipo === 'select'">
+              <select 
+                [id]="param.clave"
+                [value]="obtenerValorParametro(param)"
+                (change)="actualizarParametro(param.clave, $any($event.target).value)">
+                <option *ngFor="let opt of param.opciones" [value]="opt.valor">
+                  {{ opt.etiqueta }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #sinParametros>
+          <div class="sin-parametros">
+            <p>Este componente no tiene parámetros configurables.</p>
+          </div>
+        </ng-template>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-guardar" (click)="cerrarPanelConfiguracion()">
+          ✓ Aplicar Cambios
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

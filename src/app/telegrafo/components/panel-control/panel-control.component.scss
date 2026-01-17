@@ -1,0 +1,1606 @@
+// Variables
+$primary-color: #c9a227;
+$secondary-color: #8b4513;
+$bg-dark: #1a1a2e;
+$bg-darker: #0f0f1a;
+$bg-card: #16213e;
+$bg-primary: $bg-card;
+$bg-secondary: $bg-dark;
+$text-primary: #e8e8e8;
+$text-secondary: #a0a0a0;
+$success-color: #4ade80;
+$error-color: #f87171;
+$border-color: #2d3748;
+
+// Mixins
+@mixin card-style {
+  background: $bg-card;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+@mixin glow($color) {
+  box-shadow: 0 0 20px rgba($color, 0.3);
+}
+
+// Container principal
+.telegrafo-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, $bg-darker 0%, $bg-dark 50%, #1a1a3e 100%);
+  color: $text-primary;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  overflow-x: hidden; // Previene overflow horizontal
+  width: 100%;
+  max-width: 100vw;
+}
+
+// Header
+.telegrafo-header {
+  background: rgba($bg-darker, 0.9);
+  border-bottom: 2px solid $primary-color;
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+
+  .header-content {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .logo-icon {
+      font-size: 2.5rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: $primary-color;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin: 0;
+    }
+  }
+
+  .status-badge {
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+
+    &.active {
+      background: rgba($success-color, 0.2);
+      color: $success-color;
+      border: 1px solid $success-color;
+      @include glow($success-color);
+    }
+
+    &.inactive {
+      background: rgba($error-color, 0.2);
+      color: $error-color;
+      border: 1px solid $error-color;
+    }
+  }
+}
+
+// Main content
+.telegrafo-main {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  box-sizing: border-box;
+  overflow-x: hidden; // Previene overflow horizontal
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+}
+
+// Secciones
+section {
+  @include card-style;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden; // Previene overflow horizontal
+  overflow-y: visible; // Permite scroll vertical si es necesario
+
+  h2 {
+    font-size: 1.2rem;
+    color: $primary-color;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid $border-color;
+    word-wrap: break-word; // Previene overflow de texto
+  }
+}
+
+// Layout de Configuración y Emisores
+.config-emisores-layout {
+  display: grid;
+  grid-template-columns: 100% 100%;
+  gap: 0;
+  align-items: stretch;
+  margin-bottom: 2rem;
+  width: 100%;
+  min-height: calc(100vh - 200px);
+
+  .config-panel {
+    padding-right: 1rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .transmission-panels-right {
+    padding-left: 1rem;
+    height: 100%;
+  }
+
+  @media (max-width: 1400px) {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+
+    .config-panel {
+      padding-right: 0;
+    }
+
+    .transmission-panels-right {
+      padding-left: 0;
+    }
+  }
+}
+
+// Paneles de transmisión en la derecha
+.transmission-panels-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: sticky;
+  top: 100px;
+  height: 100%;
+  min-height: 100%;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+
+  @media (max-width: 1400px) {
+    position: static;
+    max-height: none;
+    height: auto;
+    min-height: auto;
+  }
+}
+
+// Panel de configuración
+.config-panel {
+  min-width: 0; // Permite que el contenido se ajuste
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .config-layout {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 2rem;
+    align-items: start;
+
+    @media (max-width: 1200px) {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+  }
+
+  .config-left {
+    min-width: 0; // Permite que el contenido se ajuste
+  }
+
+  .config-right {
+    @include card-style;
+    position: sticky;
+    top: 100px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+
+    @media (max-width: 1200px) {
+      position: static;
+      max-height: none;
+    }
+
+    h3 {
+      margin: 0 0 1rem 0;
+      font-size: 1.1rem;
+      color: $primary-color;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid $border-color;
+    }
+
+    .emisores-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .emisor-card {
+      @include card-style;
+      padding: 1rem;
+      border-left: 3px solid $primary-color;
+      transition: all 0.3s ease;
+      cursor: pointer;
+
+      &:hover {
+        transform: translateX(4px);
+        @include glow($primary-color);
+      }
+
+      &.manual {
+        border-left-color: #3b82f6;
+        
+        &:hover {
+          @include glow(#3b82f6);
+        }
+      }
+
+      &.automatico {
+        border-left-color: #10b981;
+        
+        &:hover {
+          @include glow(#10b981);
+        }
+      }
+
+      &.pruebas {
+        border-left-color: #f59e0b;
+        
+        &:hover {
+          @include glow(#f59e0b);
+        }
+      }
+
+      .emisor-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
+
+        .emisor-icon {
+          font-size: 1.5rem;
+        }
+
+        .emisor-title {
+          font-weight: 600;
+          color: $text-primary;
+          font-size: 0.95rem;
+        }
+      }
+
+      .emisor-card-body {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 0.5rem;
+
+        .emisor-type {
+          font-size: 0.85rem;
+          color: $text-secondary;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .emisor-index {
+          font-size: 0.75rem;
+          color: $primary-color;
+          background: rgba($primary-color, 0.1);
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+          font-weight: 600;
+        }
+      }
+    }
+
+    .no-emisores {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: $text-secondary;
+      font-style: italic;
+    }
+  }
+
+  .config-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid $border-color;
+  }
+}
+
+
+// Panel de transmisión por emisor
+.transmission-panel {
+  &.emisor-panel {
+    border-left: 4px solid $primary-color;
+    position: relative;
+    transition: all 0.3s ease;
+    min-height: 400px;
+    padding: 2rem;
+    overflow: visible;
+    height: auto;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, $primary-color, transparent);
+      opacity: 0.3;
+    }
+    
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    &.manual {
+      border-left-color: $primary-color;
+      
+      &::before {
+        background: linear-gradient(90deg, $primary-color, transparent);
+      }
+    }
+
+    &.automatico {
+      border-left-color: $success-color;
+      
+      &::before {
+        background: linear-gradient(90deg, $success-color, transparent);
+      }
+    }
+
+    &.pruebas {
+      border-left-color: #f59e0b;
+      
+      &::before {
+        background: linear-gradient(90deg, #f59e0b, transparent);
+      }
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  }
+}
+
+// Formulario de mensaje
+.message-form {
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+
+    label {
+      font-size: 0.85rem;
+      color: $text-secondary;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    input, textarea, select {
+      background: $bg-darker;
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: $text-primary;
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        @include glow($primary-color);
+      }
+
+      &::placeholder {
+        color: $text-secondary;
+        opacity: 0.6;
+      }
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .emisor-select {
+      cursor: pointer;
+      
+      option {
+        background: $bg-darker;
+        color: $text-primary;
+      }
+    }
+  }
+}
+
+// Botones
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &-primary {
+    background: linear-gradient(135deg, $primary-color, darken($primary-color, 10%));
+    color: $bg-darker;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      @include glow($primary-color);
+    }
+  }
+
+  &-secondary {
+    background: transparent;
+    border: 1px solid $border-color;
+    color: $text-primary;
+
+    &:hover:not(:disabled) {
+      border-color: $primary-color;
+      color: $primary-color;
+    }
+  }
+
+  &-danger {
+    background: transparent;
+    border: 1px solid $error-color;
+    color: $error-color;
+
+    &:hover:not(:disabled) {
+      background: rgba($error-color, 0.1);
+    }
+  }
+
+  &-send {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+    margin-top: 1rem;
+  }
+}
+
+// Loading animation
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    background: $bg-darker;
+    border-radius: 50%;
+    animation: bounce 1.4s ease-in-out infinite;
+
+    &:nth-child(1) { animation-delay: 0s; }
+    &:nth-child(2) { animation-delay: 0.2s; }
+    &:nth-child(3) { animation-delay: 0.4s; }
+  }
+}
+
+// Resultado de transmisión
+.result-panel {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1.5rem;
+
+  &.success {
+    background: rgba($success-color, 0.1);
+    border: 1px solid $success-color;
+  }
+
+  &.error {
+    background: rgba($error-color, 0.1);
+    border: 1px solid $error-color;
+  }
+
+  .result-icon {
+    font-size: 2rem;
+  }
+
+  .result-content {
+    h4 {
+      margin: 0 0 0.25rem 0;
+      font-size: 1rem;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: $text-secondary;
+    }
+
+    .error-message {
+      color: $error-color;
+    }
+  }
+}
+
+// Estado del sistema
+.system-status {
+  .status-grid {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 0;
+    width: 100%;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    // Scrollbar solo si es necesario
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba($bg-darker, 0.5);
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba($primary-color, 0.5);
+      border-radius: 3px;
+
+      &:hover {
+        background: rgba($primary-color, 0.7);
+      }
+    }
+
+    // En pantallas pequeñas, permitir scroll horizontal si es necesario
+    @media (max-width: 768px) {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+    }
+  }
+
+  .connector {
+    color: $primary-color;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    flex-grow: 0;
+    min-width: 1.5rem;
+    text-align: center;
+    
+    // En pantallas pequeñas, reducir tamaño
+    @media (max-width: 768px) {
+      font-size: 1.2rem;
+      min-width: 1.2rem;
+    }
+  }
+
+  .component-card {
+    @include card-style;
+    min-width: 120px;
+    max-width: 180px;
+    flex: 1 1 140px;
+    padding: 0.75rem;
+    border-color: $primary-color;
+    transition: all 0.3s ease;
+    
+    // Asegurar que los elementos se adapten al espacio disponible
+    @media (min-width: 1024px) {
+      flex: 1 1 0;
+      min-width: 100px;
+      max-width: 160px;
+    }
+    
+    @media (min-width: 769px) and (max-width: 1023px) {
+      flex: 1 1 120px;
+      min-width: 120px;
+      max-width: 150px;
+    }
+    
+    // En pantallas pequeñas, mantener tamaño mínimo y permitir scroll
+    @media (max-width: 768px) {
+      flex: 0 0 auto;
+      min-width: 140px;
+      max-width: 140px;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      @include glow($primary-color);
+    }
+
+    &.canal {
+      border-color: #60a5fa;
+      &:hover { @include glow(#60a5fa); }
+    }
+
+    &.rele {
+      border-color: #a78bfa;
+      &:hover { @include glow(#a78bfa); }
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+
+      .icon {
+        font-size: 1.2rem;
+      }
+
+      .title {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: $text-secondary;
+        letter-spacing: 1px;
+      }
+    }
+
+    .card-body {
+      .name {
+        font-size: 0.85rem;
+        margin: 0 0 0.5rem 0;
+        color: $text-primary;
+      }
+
+      .status {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+
+        &.on {
+          background: rgba($success-color, 0.2);
+          color: $success-color;
+        }
+
+        &:not(.on) {
+          background: rgba($text-secondary, 0.2);
+          color: $text-secondary;
+        }
+      }
+
+      .stats {
+        margin: 0.5rem 0 0 0;
+        font-size: 0.75rem;
+        color: $text-secondary;
+      }
+    }
+  }
+}
+
+// Estadísticas generales
+.general-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid $border-color;
+
+  .stat {
+    text-align: center;
+
+    .stat-value {
+      display: block;
+      font-size: 2rem;
+      font-weight: 700;
+      color: $primary-color;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: $text-secondary;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    &.success .stat-value { color: $success-color; }
+    &.error .stat-value { color: $error-color; }
+  }
+}
+
+// No system message
+.no-system {
+  text-align: center;
+  padding: 2rem;
+  color: $text-secondary;
+}
+
+// Footer
+.telegrafo-footer {
+  text-align: center;
+  padding: 1.5rem;
+  color: $text-secondary;
+  font-size: 0.85rem;
+  border-top: 1px solid $border-color;
+  margin-top: 2rem;
+}
+
+// Animations
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+}
+
+// Signal panel - ocupa 2 columnas (de izquierda a derecha)
+.signal-panel {
+  grid-column: 1 / -1;
+}
+
+// History panel - full width
+.history-panel {
+  grid-column: 1 / -1;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PANEL DE TRANSMISIÓN AUTOMÁTICA
+// ═══════════════════════════════════════════════════════════════════════════
+
+.auto-panel {
+  .auto-info {
+    background: rgba($primary-color, 0.1);
+    border: 1px solid rgba($primary-color, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    
+    p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: $text-secondary;
+      line-height: 1.5;
+    }
+  }
+
+  .auto-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    .intervalo-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      label {
+        font-size: 0.85rem;
+        color: $text-secondary;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .intervalo-select {
+        background: $bg-darker;
+        border: 1px solid $border-color;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        color: $text-primary;
+        font-family: inherit;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:focus {
+          outline: none;
+          border-color: $primary-color;
+          @include glow($primary-color);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        option {
+          background: $bg-darker;
+          color: $text-primary;
+        }
+      }
+    }
+
+    .btn-auto {
+      padding: 1rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+
+      &.btn-start {
+        background: linear-gradient(135deg, $success-color, darken($success-color, 15%));
+        color: $bg-darker;
+
+        &:hover {
+          transform: translateY(-2px);
+          @include glow($success-color);
+        }
+      }
+
+      &.btn-stop {
+        background: linear-gradient(135deg, $error-color, darken($error-color, 15%));
+        color: white;
+
+        &:hover {
+          transform: translateY(-2px);
+          @include glow($error-color);
+        }
+      }
+    }
+  }
+
+  .auto-status {
+    background: $bg-darker;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+
+      .status-indicator {
+        font-size: 1.2rem;
+        color: $text-secondary;
+        animation: none;
+
+        &.active {
+          color: $success-color;
+          animation: blink 1s ease-in-out infinite;
+        }
+      }
+
+      .status-text {
+        font-size: 0.95rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 2rem;
+      padding: 0.75rem 0;
+      border-top: 1px solid $border-color;
+      border-bottom: 1px solid $border-color;
+
+      .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        .stat-label {
+          font-size: 0.8rem;
+          color: $text-secondary;
+        }
+
+        .stat-value {
+          font-size: 1.1rem;
+          font-weight: 700;
+          color: $primary-color;
+        }
+      }
+    }
+
+    .ultimo-mensaje {
+      margin-top: 1rem;
+      
+      .label {
+        display: block;
+        font-size: 0.8rem;
+        color: $text-secondary;
+        margin-bottom: 0.5rem;
+      }
+
+      .mensaje-codigo {
+        display: block;
+        background: rgba($primary-color, 0.1);
+        border: 1px solid rgba($primary-color, 0.3);
+        border-radius: 6px;
+        padding: 0.75rem 1rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.85rem;
+        color: $primary-color;
+        word-break: break-all;
+        word-wrap: break-word;
+        max-height: 80px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        width: 100%;
+        box-sizing: border-box;
+
+        &::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background: rgba($bg-darker, 0.5);
+          border-radius: 3px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: rgba($primary-color, 0.5);
+          border-radius: 3px;
+
+          &:hover {
+            background: rgba($primary-color, 0.7);
+          }
+        }
+      }
+    }
+  }
+}
+
+// Animación de parpadeo para indicador activo
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INDICADOR DE BATERÍA
+// ═══════════════════════════════════════════════════════════════════════════
+
+.battery-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: rgba($bg-darker, 0.5);
+  border-radius: 6px;
+
+  .battery-icon {
+    font-size: 1rem;
+  }
+
+  .battery-bar {
+    flex: 1;
+    height: 10px;
+    background: rgba($text-secondary, 0.2);
+    border-radius: 5px;
+    overflow: hidden;
+    min-width: 50px;
+
+    .battery-level {
+      height: 100%;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+
+      &.high {
+        background: linear-gradient(90deg, $success-color, lighten($success-color, 10%));
+      }
+
+      &.medium {
+        background: linear-gradient(90deg, #fbbf24, #f59e0b);
+      }
+
+      &.low {
+        background: linear-gradient(90deg, $error-color, lighten($error-color, 10%));
+        animation: pulse-battery 1s ease-in-out infinite;
+      }
+    }
+  }
+
+  .battery-text {
+    font-size: 0.75rem;
+    font-weight: 600;
+    min-width: 35px;
+    text-align: right;
+
+    &.critico {
+      color: #fbbf24;
+    }
+
+    &.agotada {
+      color: $error-color;
+    }
+  }
+}
+
+// Estilos para tarjetas con batería crítica o agotada
+.component-card {
+  &.bateria-critica {
+    border-color: #fbbf24 !important;
+    animation: pulse-warning 2s ease-in-out infinite;
+  }
+
+  &.bateria-agotada {
+    border-color: $error-color !important;
+    opacity: 0.7;
+    
+    .card-body .name {
+      text-decoration: line-through;
+      color: $text-secondary;
+    }
+  }
+}
+
+@keyframes pulse-battery {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes pulse-warning {
+  0%, 100% { box-shadow: 0 0 0 rgba(#fbbf24, 0); }
+  50% { box-shadow: 0 0 15px rgba(#fbbf24, 0.4); }
+}
+
+// Paneles de receptores
+.transmission-panel {
+  &.receptor-panel {
+    border-left: 4px solid #8b5cf6;
+    position: relative;
+    transition: all 0.3s ease;
+    min-height: 300px;
+    padding: 2rem;
+    overflow: visible;
+    height: auto;
+    margin-top: 1.5rem;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #8b5cf6, transparent);
+      opacity: 0.3;
+    }
+    
+    &.fichero {
+      border-left-color: #10b981;
+      
+      &::before {
+        background: linear-gradient(90deg, #10b981, transparent);
+      }
+    }
+    
+    h2 {
+      margin-bottom: 1.5rem;
+      font-size: 1.3rem;
+      color: $text-primary;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .receptor-info {
+      margin-bottom: 1.5rem;
+      
+      .status-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        
+        .status-indicator {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: $text-secondary;
+          transition: all 0.3s ease;
+          
+          &.active {
+            background: #10b981;
+            box-shadow: 0 0 8px rgba(#10b981, 0.5);
+          }
+        }
+        
+        .status-text {
+          font-size: 0.9rem;
+          color: $text-secondary;
+          font-weight: 500;
+        }
+      }
+      
+      .stats-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        
+        .stat-label {
+          font-size: 0.9rem;
+          color: $text-secondary;
+        }
+        
+        .stat-value {
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: $primary-color;
+        }
+      }
+    }
+    
+    .receptor-actions {
+      margin-bottom: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid $border-color;
+      
+      .btn {
+        width: 100%;
+      }
+    }
+    
+    .mensajes-receptor {
+      margin-top: 1.5rem;
+      
+      h3 {
+        font-size: 1rem;
+        color: $text-primary;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid $border-color;
+      }
+      
+      .mensajes-list {
+        max-height: 400px;
+        overflow-y: auto;
+        padding-right: 0.5rem;
+        
+        &::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        &::-webkit-scrollbar-track {
+          background: rgba($border-color, 0.3);
+          border-radius: 3px;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+          background: rgba($primary-color, 0.5);
+          border-radius: 3px;
+          
+          &:hover {
+            background: rgba($primary-color, 0.7);
+          }
+        }
+      }
+      
+      .mensaje-item {
+        padding: 1rem 0;
+        
+        .mensaje-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 0.5rem;
+          
+          .mensaje-remitente {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: $primary-color;
+          }
+          
+          .mensaje-fecha {
+            font-size: 0.75rem;
+            color: $text-secondary;
+          }
+        }
+        
+        .mensaje-contenido {
+          font-size: 0.9rem;
+          color: $text-primary;
+          padding: 0.75rem;
+          background: rgba($primary-color, 0.05);
+          border-radius: 4px;
+          border-left: 3px solid $primary-color;
+          word-wrap: break-word;
+        }
+        
+        .mensaje-separator {
+          height: 1px;
+          background: $border-color;
+          margin-top: 1rem;
+        }
+      }
+    }
+    
+    .sin-mensajes {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: $text-secondary;
+      font-style: italic;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MODAL DE MEMORIA
+// ═══════════════════════════════════════════════════════════════════════════
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 2rem;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.memoria-modal {
+  background: $bg-primary;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 2px solid $border-color;
+  
+  h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: $text-primary;
+  }
+  
+  .btn-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: $text-secondary;
+    cursor: pointer;
+    padding: 0.5rem;
+    line-height: 1;
+    transition: color 0.2s;
+    
+    &:hover {
+      color: $text-primary;
+    }
+  }
+}
+
+.modal-body {
+  padding: 2rem;
+  overflow-y: auto;
+  flex: 1;
+  
+  .memoria-stats {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: rgba($primary-color, 0.1);
+    border-radius: 8px;
+    
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      
+      .stat-label {
+        font-size: 0.85rem;
+        color: $text-secondary;
+        font-weight: 500;
+      }
+      
+      .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: $primary-color;
+        
+        &.success {
+          color: #4caf50;
+        }
+        
+        &.error {
+          color: #f44336;
+        }
+      }
+    }
+  }
+  
+  .memoria-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 500px;
+    overflow-y: auto;
+    
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: rgba($border-color, 0.3);
+      border-radius: 4px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: rgba($primary-color, 0.5);
+      border-radius: 4px;
+      
+      &:hover {
+        background: rgba($primary-color, 0.7);
+      }
+    }
+  }
+  
+    .memoria-item {
+    border: 2px solid $border-color;
+    border-radius: 8px;
+    padding: 1rem;
+    background: $bg-secondary;
+    transition: all 0.2s;
+    
+    &.mensaje {
+      border-left: 4px solid #4caf50;
+      
+      &:hover {
+        border-color: #4caf50;
+        box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+      }
+    }
+    
+    &.enviado {
+      border-left: 4px solid #60a5fa;
+      
+      &:hover {
+        border-color: #60a5fa;
+        box-shadow: 0 2px 8px rgba(96, 165, 250, 0.2);
+      }
+    }
+    
+    &.error {
+      border-left: 4px solid #f44336;
+      
+      &:hover {
+        border-color: #f44336;
+        box-shadow: 0 2px 8px rgba(244, 67, 54, 0.2);
+      }
+    }
+    
+    .memoria-item-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid $border-color;
+      
+      .memoria-indice {
+        font-weight: 700;
+        color: $text-secondary;
+        font-size: 0.9rem;
+      }
+      
+      .memoria-tipo {
+        font-weight: 600;
+        font-size: 0.95rem;
+        
+        &.tipo-mensaje {
+          color: #4caf50;
+        }
+        
+        &.tipo-enviado {
+          color: #60a5fa;
+        }
+        
+        &.tipo-error {
+          color: #f44336;
+        }
+      }
+      
+      .memoria-timestamp {
+        margin-left: auto;
+        font-size: 0.85rem;
+        color: $text-secondary;
+      }
+    }
+    
+    .memoria-item-body {
+      .memoria-mensaje-info,
+      .memoria-enviado-info,
+      .memoria-error-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        
+        .info-row {
+          display: flex;
+          gap: 0.5rem;
+          
+          .info-label {
+            font-weight: 600;
+            color: $text-secondary;
+            min-width: 100px;
+            font-size: 0.9rem;
+          }
+          
+          .info-value {
+            color: $text-primary;
+            flex: 1;
+            
+            &.contenido-mensaje {
+              background: rgba($primary-color, 0.05);
+              padding: 0.75rem;
+              border-radius: 4px;
+              border-left: 3px solid $primary-color;
+              word-wrap: break-word;
+            }
+            
+            &.contenido-enviado {
+              background: rgba(96, 165, 250, 0.1);
+              padding: 0.75rem;
+              border-radius: 4px;
+              border-left: 3px solid #60a5fa;
+              word-wrap: break-word;
+            }
+            
+            &.contenido-recibido {
+              background: rgba(76, 175, 80, 0.1);
+              padding: 0.75rem;
+              border-radius: 4px;
+              border-left: 3px solid #4caf50;
+              word-wrap: break-word;
+            }
+            
+            &.error-code {
+              font-family: monospace;
+              font-weight: 600;
+              color: #f44336;
+            }
+            
+            &.error-mensaje {
+              color: #f44336;
+              font-weight: 500;
+            }
+            
+            &.exito {
+              color: #4caf50;
+              font-weight: 600;
+            }
+            
+            &.fallo {
+              color: #f44336;
+              font-weight: 600;
+            }
+            
+            &.recuperable {
+              color: #4caf50;
+              font-weight: 600;
+            }
+            
+            &.no-recuperable {
+              color: #f44336;
+              font-weight: 600;
+            }
+            
+            &.sugerencia {
+              font-style: italic;
+              color: $text-secondary;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .memoria-vacia {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: $text-secondary;
+    font-style: italic;
+  }
+}
+
+.modal-footer {
+  padding: 1.5rem 2rem;
+  border-top: 2px solid $border-color;
+  display: flex;
+  justify-content: flex-end;
+  
+  .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+}
