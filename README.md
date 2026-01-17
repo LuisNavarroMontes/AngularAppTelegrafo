@@ -1,27 +1,78 @@
 # AngularAppTelegrafo
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.16.
+Este proyecto fue generado con [Angular CLI](https://github.com/angular/angular-cli) versión 18.2.16.
 
-## Development server
+## Requisitos del Sistema
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+### Versiones Requeridas
 
-## Code scaffolding
+- **Node.js**: 18.9.0 o superior (recomendado: 18.x LTS o 20.x LTS)
+- **Angular**: 18.2.0
+- **Angular CLI**: 18.2.16
+- **npm**: 9.0.0 o superior (incluido con Node.js)
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+### Verificar Versiones
 
-## Build
+Para verificar las versiones instaladas en tu sistema, ejecuta:
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+```bash
+node --version
+npm --version
+ng version
+```
 
-## Running unit tests
+## Instalación
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+1. Clona o descarga este repositorio
+2. Navega a la carpeta del proyecto:
+   ```bash
+   cd AngularAppTelegrafo
+   ```
+3. Instala las dependencias del proyecto:
+   ```bash
+   npm install --force
+   ```
 
-## Running end-to-end tests
+> **Nota**: Se utiliza `--force` para resolver posibles conflictos de dependencias y asegurar la instalación correcta de todos los paquetes.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## Ejecutar la Aplicación
 
-## Further help
+Para iniciar el servidor de desarrollo, ejecuta:
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+```bash
+ng serve -o
+```
+
+Este comando:
+- Inicia el servidor de desarrollo de Angular
+- Abre automáticamente la aplicación en tu navegador predeterminado (`http://localhost:4200/`)
+- La aplicación se recargará automáticamente si cambias alguno de los archivos fuente
+
+## Comandos Adicionales
+
+### Servidor de desarrollo (sin abrir navegador)
+```bash
+ng serve
+```
+
+### Compilar para producción
+```bash
+ng build
+```
+Los archivos compilados se almacenarán en el directorio `dist/`.
+
+### Ejecutar pruebas unitarias
+```bash
+ng test
+```
+Ejecuta las pruebas unitarias mediante [Karma](https://karma-runner.github.io).
+
+### Generar componentes
+```bash
+ng generate component nombre-componente
+```
+También puedes usar `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+
+## Ayuda Adicional
+
+Para obtener más ayuda sobre Angular CLI, ejecuta `ng help` o visita la [página de referencia de Angular CLI](https://angular.dev/tools/cli).
